@@ -1,6 +1,8 @@
 name: VelaBeat Baseline (Debug)
 
 on:
+  push:
+    branches: [develop/velabeat-baseline]
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -34,7 +36,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :app:tasks :tv:tasks --all > gradle-tasks.txt
       - name: Build Android and TV debug APKs
-        run: ./gradlew :app:assembleDevDebug :tv:assembleDebug --stacktrace
+        run: ./gradlew :app:assembleDevDebug :tv:assembleDevDebug --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:
