@@ -31,6 +31,8 @@ jobs:
           java-version: '17'
           cache: gradle
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
       - name: Check Gradle tasks
         run: |
           chmod +x ./gradlew
