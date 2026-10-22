@@ -39,12 +39,28 @@ jobs:
           ./gradlew :app:tasks :tv:tasks --all > gradle-tasks.txt
       - name: Build Android and TV debug APKs
         run: ./gradlew :app:assembleDevDebug :tv:assembleDevDebug --stacktrace
-      - uses: actions/upload-artifact@v4
+      - name: Report APK sizes
+        if: success()
+        run: |
+          find app/build/outputs/apk tv/build/outputs/apk -type f -name '*.apk' -printf '%p %s bytes\n' | sort
+      - name: Upload mobile debug APKs
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: velabeat-mobile-debug
+          path: app/build/outputs/apk/**/*debug*.apk
+          if-no-files-found: error
+      - name: Upload TV debug APKs
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: velabeat-tv-debug
+          path: tv/build/outputs/apk/**/*debug*.apk
+          if-no-files-found: error
+      - name: Upload Gradle task report
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: velabeat-baseline-debug
-          path: |
-            app/build/outputs/apk/**/*debug*.apk
-            tv/build/outputs/apk/**/*debug*.apk
-            gradle-tasks.txt
+          name: velabeat-gradle-tasks
+          path: gradle-tasks.txt
           if-no-files-found: warn
