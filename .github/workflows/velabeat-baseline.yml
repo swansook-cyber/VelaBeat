@@ -34,7 +34,7 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :app:tasks :tv:tasks --all > gradle-tasks.txt
       - name: Build Android and TV debug APKs
-        run: ./gradlew :app:assembleDebug :tv:assembleDebug --stacktrace
+        run: ./gradlew :app:assembleDevDebug :tv:assembleDebug --stacktrace
       - uses: actions/upload-artifact@v4
         if: always()
         with:
