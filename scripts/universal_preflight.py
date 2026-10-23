@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only preflight for a future single-package VelaBeat APK."""
 from pathlib import Path
-import re
+import json
 import sys
 import xml.etree.ElementTree as ET
 
@@ -40,6 +40,30 @@ print(f"Overridden Kotlin paths: {len(overlap)}")
 print("\n[TV overrides: must resolve before merging source trees]")
 for name in overlap:
     print("  " + name)
+expected_overrides = {
+    "com/music/bitchord/wear/WatchInstaller.kt",
+    "com/music/bitchord/wear/WearBridge.kt",
+}
+unexpected_overrides = set(overlap) - expected_overrides
+if unexpected_overrides:
+    issues.append("Unexpected Kotlin overrides: " + ", ".join(sorted(unexpected_overrides)))
+if set(overlap) != expected_overrides:
+    issues.append("Wear override inventory changed; review universal source isolation")
+
+# TV's inert Wear stubs must not shadow real mobile Wear implementations.
+plan = {
+    "schema_version": 1,
+    "mobile_kotlin_count": len(mobile_paths),
+    "tv_kotlin_count": len(tv_paths),
+    "tv_only_kotlin_count": len(only_tv),
+    "tv_only_sources": only_tv,
+    "excluded_tv_overrides": sorted(expected_overrides),
+    "unexpected_overrides": sorted(unexpected_overrides),
+    "note": "Source inventory only; no unified APK has been compiled",
+}
+report = root / "universal-source-inventory.json"
+report.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
+print(f"\nMachine-readable inventory: {report.name}")
 print("\n[TV-only Kotlin paths]")
 for name in only_tv:
     print("  " + name)
