@@ -2,7 +2,7 @@ name: VelaBeat Baseline (Debug)
 
 on:
   push:
-    branches: [develop/velabeat-baseline, feature/velabeat-identity]
+    branches: [develop/velabeat-baseline, feature/velabeat-identity, feature/velabeat-universal-audit]
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -20,6 +20,19 @@ permissions:
   contents: read
 
 jobs:
+  universal-preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit launcher entries and TV source overrides
+        run: python3 scripts/universal_preflight.py | tee universal-preflight.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: velabeat-universal-preflight
+          path: universal-preflight.txt
+          if-no-files-found: warn
+
   android-debug:
     runs-on: ubuntu-latest
     timeout-minutes: 45
