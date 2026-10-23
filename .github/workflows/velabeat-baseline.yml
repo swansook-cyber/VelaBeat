@@ -35,6 +35,35 @@ jobs:
             universal-source-inventory.json
           if-no-files-found: warn
 
+  universal-source-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    continue-on-error: true # exploratory: never block existing mobile/TV builds
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools'
+      - name: Compile mobile with TV sources (experimental)
+        id: compile
+        shell: bash
+        run: |
+          chmod +x ./gradlew
+          set -o pipefail
+          ./gradlew :app:compileDevDebugKotlin -Pvelabeat.universalTvSourceProbe=true --stacktrace 2>&1 | tee universal-source-probe.log
+      - name: Upload experimental compiler log
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: velabeat-universal-source-probe
+          path: universal-source-probe.log
+          if-no-files-found: warn
+
   android-debug:
     runs-on: ubuntu-latest
     timeout-minutes: 45
