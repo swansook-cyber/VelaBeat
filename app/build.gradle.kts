@@ -106,6 +106,7 @@ android {
                 java.srcDir("../tv/src/main/java")
                 // TvTheme uses fonts packaged only in the TV module.
                 res.srcDir("../tv/src/main/res")
+                manifest.srcFile("src/universalProbe/AndroidManifest.xml")
             }
         }
     }
