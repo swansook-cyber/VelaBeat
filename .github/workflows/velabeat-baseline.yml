@@ -55,7 +55,14 @@ jobs:
         run: |
           chmod +x ./gradlew
           set -o pipefail
-          ./gradlew :app:compileDevDebugKotlin -Pvelabeat.universalTvSourceProbe=true --stacktrace 2>&1 | tee universal-source-probe.log
+          ./gradlew :app:assembleDevDebug -Pvelabeat.universalTvSourceProbe=true --stacktrace 2>&1 | tee universal-source-probe.log
+      - name: Upload experimental APKs (not universal UI yet)
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: velabeat-combined-source-debug
+          path: app/build/outputs/apk/**/*debug*.apk
+          if-no-files-found: error
       - name: Upload experimental compiler log
         uses: actions/upload-artifact@v4
         if: always()
