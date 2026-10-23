@@ -34,3 +34,10 @@ One installable APK with one application ID for Android phone, tablet, Android T
 - The TV module shares phone sources but its `TvActivity` and TV Compose UI are not automatically compiled into the phone `app` module. An app-module dependency/source-set strategy is needed before referencing TV classes.
 - Proposed initial prototype: preserve mobile `MainActivity`; add an independently named TV entry activity to the app module, register only TV leanback launcher on it, and keep touch features optional. Confirm `TvApp` dependencies/resources compile before wiring runtime routing.
 - Validate media session entry points: existing TV code aliases `.MainActivity` to `.TvActivity` for notifications/widgets, so a universal build needs explicit device-aware launch intents rather than assuming one activity name works on all devices.
+
+## Build-path finding and safe fixes
+- TV source overrides are selected by `replacedByTv` in `tv/build.gradle.kts`, which excludes phone Kotlin files sharing a relative path with TV replacements. Blindly adding the whole TV source directory to `app` would cause duplicate declarations or silently change phone behavior.
+- Both `verifyDevInstall` Gradle tasks previously targeted `com.dev.bitchord`; fixed to the corresponding VelaBeat mobile/TV dev application IDs on this experimental branch.
+- Compose TV dependencies include `androidx.tv:tv-material:1.0.0` and `androidx.tv:tv-foundation:1.0.0-alpha12`. They must be added to the chosen universal module only when the TV UI source inclusion strategy is ready.
+- Next code gate: inventory every TV override and its references; decide between extracting a shared TV UI library module or selective inclusion into `app`. Prefer a shared library module to avoid duplicating classes.
+- The universal build remains unimplemented; no CI result or device test is implied by these changes.
