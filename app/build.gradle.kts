@@ -104,6 +104,8 @@ android {
         sourceSets {
             getByName("main") {
                 java.srcDir("../tv/src/main/java")
+                // TvTheme uses fonts packaged only in the TV module.
+                res.srcDir("../tv/src/main/res")
             }
         }
     }
