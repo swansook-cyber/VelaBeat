@@ -2,7 +2,7 @@ name: VelaBeat Baseline (Debug)
 
 on:
   push:
-    branches: [develop/velabeat-baseline, feature/velabeat-identity, feature/velabeat-universal-audit]
+    branches: [develop/velabeat-baseline, feature/velabeat-identity, feature/velabeat-universal-audit, feature/velabeat-car-display]
   workflow_dispatch:
   pull_request:
     branches: [main]
