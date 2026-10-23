@@ -62,6 +62,13 @@ jobs:
         run: |
           set -euo pipefail
           : > universal-apk-launchers.txt
+          # Android build-tools binaries are not necessarily on PATH on runners.
+          AAPT="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          if [ -z "$AAPT" ] || [ ! -x "$AAPT" ]; then
+            echo "Android aapt not found in SDK build-tools" >&2
+            exit 1
+          fi
+          echo "Using $AAPT"
           mapfile -t apks < <(find app/build/outputs/apk -type f -name '*debug*.apk' | sort)
           if [ "${#apks[@]}" -eq 0 ]; then
             echo "No debug APKs found" >&2
@@ -69,8 +76,8 @@ jobs:
           fi
           for apk in "${apks[@]}"; do
             echo "=== $apk ===" | tee -a universal-apk-launchers.txt
-            aapt dump badging "$apk" | grep -E "^(package:|launchable-activity:|leanback-launchable-activity:)" | tee -a universal-apk-launchers.txt
-            aapt dump xmltree "$apk" AndroidManifest.xml > universal-manifest-tree.txt
+            "$AAPT" dump badging "$apk" | grep -E "^(package:|launchable-activity:|leanback-launchable-activity:)" | tee -a universal-apk-launchers.txt
+            "$AAPT" dump xmltree "$apk" AndroidManifest.xml > universal-manifest-tree.txt
             if ! grep -q 'net.velalab.velabeat' universal-apk-launchers.txt; then
               echo "Expected VelaBeat package not found" >&2
               exit 1
