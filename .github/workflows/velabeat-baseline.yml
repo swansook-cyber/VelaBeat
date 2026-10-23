@@ -56,6 +56,39 @@ jobs:
           chmod +x ./gradlew
           set -o pipefail
           ./gradlew :app:assembleDevDebug -Pvelabeat.universalTvSourceProbe=true --stacktrace 2>&1 | tee universal-source-probe.log
+      - name: Verify combined APK launcher entries
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          : > universal-apk-launchers.txt
+          mapfile -t apks < <(find app/build/outputs/apk -type f -name '*debug*.apk' | sort)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "No debug APKs found" >&2
+            exit 1
+          fi
+          for apk in "${apks[@]}"; do
+            echo "=== $apk ===" | tee -a universal-apk-launchers.txt
+            aapt dump badging "$apk" | grep -E "^(package:|launchable-activity:|leanback-launchable-activity:)" | tee -a universal-apk-launchers.txt
+            aapt dump xmltree "$apk" AndroidManifest.xml > universal-manifest-tree.txt
+            if ! grep -q 'net.velalab.velabeat' universal-apk-launchers.txt; then
+              echo "Expected VelaBeat package not found" >&2
+              exit 1
+            fi
+            if ! grep -q 'leanback-launchable-activity:' universal-apk-launchers.txt; then
+              echo "Missing Leanback launcher entry" >&2
+              exit 1
+            fi
+          done
+      - name: Upload launcher inspection
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: velabeat-universal-launcher-inspection
+          path: |
+            universal-apk-launchers.txt
+            universal-manifest-tree.txt
+          if-no-files-found: warn
       - name: Upload experimental APKs (not universal UI yet)
         uses: actions/upload-artifact@v4
         if: success()
