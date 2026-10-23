@@ -237,7 +237,7 @@
             android:enabled="${velabeatTvLauncherEnabled}"
             android:exported="${velabeatTvLauncherEnabled}"
             android:label="@string/app_name"
-            android:banner="@drawable/tv_banner"
+            android:banner="@drawable/velabeat_tv_banner"
             android:theme="@style/Theme.BitChord">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
