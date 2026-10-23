@@ -30,7 +30,9 @@ jobs:
         if: always()
         with:
           name: velabeat-universal-preflight
-          path: universal-preflight.txt
+          path: |
+            universal-preflight.txt
+            universal-source-inventory.json
           if-no-files-found: warn
 
   android-debug:
