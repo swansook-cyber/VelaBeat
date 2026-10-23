@@ -26,3 +26,11 @@ One installable APK with one application ID for Android phone, tablet, Android T
 - Do not merge source trees by text replacement: TV overrides can shadow app classes.
 - Do not remove either existing module, merge into main, deploy or publish to Vela App Store without approval.
 - This audit is not evidence that a single APK has built or passed QA.
+
+## Source-level findings (2026-10-23)
+- `tv/src/main/java/com/music/bitchord/TvActivity.kt` is a dedicated `ComponentActivity` with `TvApp`, `BitChordTvTheme`, shared `MainViewModel`, `rememberMediaController` and `rememberPlayerState`. It attaches `TvRefreshRateController`, consumes playback/invite links, and pauses playback when finishing. These semantics need deliberate preservation.
+- TV's manifest uses an exported `.MainActivity` **activity-alias** targeting non-exported `.TvActivity`; launcher includes both `LAUNCHER` and `LEANBACK_LAUNCHER` and `APP_MUSIC`. A single merged manifest cannot simply duplicate `.MainActivity` as both an activity and alias.
+- Mobile's `MainActivity` is an `AppCompatActivity` with touch-focused Compose UI and activity-result handling; avoid replacing it globally.
+- The TV module shares phone sources but its `TvActivity` and TV Compose UI are not automatically compiled into the phone `app` module. An app-module dependency/source-set strategy is needed before referencing TV classes.
+- Proposed initial prototype: preserve mobile `MainActivity`; add an independently named TV entry activity to the app module, register only TV leanback launcher on it, and keep touch features optional. Confirm `TvApp` dependencies/resources compile before wiring runtime routing.
+- Validate media session entry points: existing TV code aliases `.MainActivity` to `.TvActivity` for notifications/widgets, so a universal build needs explicit device-aware launch intents rather than assuming one activity name works on all devices.
