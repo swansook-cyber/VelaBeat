@@ -49,3 +49,12 @@ One installable APK with one application ID for Android phone, tablet, Android T
 - Existing TV Gradle build uses a per-relative-path override mechanism to exclude phone Kotlin classes replaced by TV implementations. A universal module must not indiscriminately include TV's entire Java tree.
 - Before introducing a unified launcher, determine the full transitive TV-only source set and resources, then identify duplicate classes. Preserve `TvActivity` lifecycle semantics and TV's intentional pause-on-exit behavior.
 - No single-APK implementation or CI verification has occurred in this inventory phase.
+
+## Confirmed preflight result supplied by tester
+- PASS for current app/TV package and entry-point invariants; **not** a universal build.
+- Mobile Kotlin: 258; TV Kotlin: 38; TV-only Kotlin: 36; exact overlapping paths: 2.
+- Overlap: `com/music/bitchord/wear/WatchInstaller.kt` and `com/music/bitchord/wear/WearBridge.kt`.
+- Examined TV overrides: both are intentionally no-op stubs for Wear integration on TV. They must **not** be copied into a unified module that retains mobile Wear functionality; keep mobile implementations and use runtime capability gating on TV.
+- TV-only `ui/tv/DeviceType.kt` already implements TV classification using `UiModeManager` and package features, plus touch and low-RAM checks. Prefer reuse rather than another device classifier.
+- Mobile has 13 launcher aliases; TV has one alias combining `LAUNCHER` and `LEANBACK_LAUNCHER`. A unified manifest must avoid multiple enabled launcher entries.
+- Recommended next prototype: add TV-only source files excluding two Wear stubs to a separate isolated source directory or shared Android library, then compile-check dependencies/resources before wiring launchers. Avoid touching existing playback classes.
