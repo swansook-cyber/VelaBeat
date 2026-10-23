@@ -100,13 +100,16 @@ android {
     // TV Wear stubs must never shadow the phone's real Wear integrations.
     val universalTvSourceProbe = providers.gradleProperty("velabeat.universalTvSourceProbe")
         .map(String::toBoolean).getOrElse(false)
+    defaultConfig {
+        manifestPlaceholders["velabeatTvLauncherEnabled"] = universalTvSourceProbe.toString()
+    }
     if (universalTvSourceProbe) {
         sourceSets {
             getByName("main") {
                 java.srcDir("../tv/src/main/java")
                 // TvTheme uses fonts packaged only in the TV module.
                 res.srcDir("../tv/src/main/res")
-                manifest.srcFile("src/universalProbe/AndroidManifest.xml")
+
             }
         }
     }
