@@ -358,7 +358,11 @@ fun MiniPlayer(
     /** Dragging the bar up into the player. */
     pull: MiniPlayerPull? = null,
     modifier: Modifier = Modifier,
+    carDisplay: Boolean = false,
 ) {
+    val transportSlot = if (carDisplay) 56.dp else GLYPH_SLOT
+    val transportGlyph = if (carDisplay) 36.dp else GLYPH_SIZE
+    val rowVerticalPadding = if (carDisplay) 10.dp else ROW_PADDING_VERTICAL
     val reduceDynamicBlur by AppSettings.reduceDynamicBlur.collectAsStateWithLifecycle()
     val haptics = rememberHaptics()
     // percent rather than a dp figure, so the corner stays exactly half the
@@ -405,7 +409,7 @@ fun MiniPlayer(
                 .fillMaxWidth()
                 .padding(
                     horizontal = ROW_PADDING_HORIZONTAL,
-                    vertical = ROW_PADDING_VERTICAL,
+                    vertical = rowVerticalPadding,
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -435,7 +439,7 @@ fun MiniPlayer(
                 )
             }
             if (isLoading) {
-                Box(Modifier.size(GLYPH_SLOT), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(transportSlot), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onBackground,
                         strokeWidth = 2.dp,
@@ -448,13 +452,13 @@ fun MiniPlayer(
                         haptics.play(if (isPlaying) Haptic.Pause else Haptic.Resume)
                         onPlayPause()
                     },
-                    modifier = Modifier.size(GLYPH_SLOT),
+                    modifier = Modifier.size(transportSlot),
                 ) {
                     Icon(
                         imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                         contentDescription = stringResource(if (isPlaying) R.string.pause else R.string.play),
                         tint = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.size(GLYPH_SIZE),
+                        modifier = Modifier.size(transportGlyph),
                     )
                 }
             }
@@ -467,7 +471,7 @@ fun MiniPlayer(
                     onNext()
                 },
                 enabled = !controlsLocked,
-                modifier = Modifier.size(GLYPH_SLOT),
+                modifier = Modifier.size(transportSlot),
             ) {
                 MiniPlayerNextGlyph(
                     tint = MaterialTheme.colorScheme.onBackground
