@@ -253,6 +253,8 @@ import com.music.bitchord.data.sources.SourceKind
 import com.music.bitchord.data.sources.SourceRegistry
 import com.music.bitchord.ui.components.ListenBrainzTokenAlert
 import com.music.bitchord.ui.components.MiniPlayer
+import com.music.bitchord.ui.car.CarDisplayLayout
+import com.music.bitchord.ui.tv.DeviceType
 import com.music.bitchord.ui.components.QueueActionNotice
 import com.music.bitchord.ui.components.QueueActionNoticeHost
 import com.music.bitchord.ui.components.TopBarAccountButton
@@ -4026,6 +4028,7 @@ private fun BitChordApp(
                             dock = activeDock,
                             pull = playerSheetMotion.takeIf { !reducePlayerMotion },
                             modifier = Modifier.fillMaxWidth(),
+                            carDisplay = CarDisplayLayout.isEligible(LocalContext.current, DeviceType.isTv(LocalContext.current)),
                         )
                         Spacer(Modifier.height(8.dp))
                     }
