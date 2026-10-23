@@ -14,10 +14,10 @@ import android.content.res.Configuration
 object CarDisplayLayout {
     fun isEligible(
         context: Context,
-        isTelevision: Boolean,
         minimumWidthDp: Int = 720
     ): Boolean {
-        if (isTelevision) return false
+        val packageManager = context.packageManager
+        if (packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)) return false
         val configuration = context.resources.configuration
         val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         val usableWidth = configuration.screenWidthDp
