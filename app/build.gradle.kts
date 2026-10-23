@@ -95,6 +95,19 @@ android {
         }
     }
 
+    // Experimental single-APK source compilation. Off by default; deliberately
+    // does not alter launchers, package IDs, or release builds.
+    // TV Wear stubs must never shadow the phone's real Wear integrations.
+    val universalTvSourceProbe = providers.gradleProperty("velabeat.universalTvSourceProbe")
+        .map(String::toBoolean).getOrElse(false)
+    if (universalTvSourceProbe) {
+        sourceSets {
+            getByName("main") {
+                java.srcDir("../tv/src/main/java")
+            }
+        }
+    }
+
     // The phone <-> watch protocol, one file shared with the watch app so the
     // two cannot drift. See wearos/protocol/.../WearProtocol.kt.
     sourceSets {
@@ -285,6 +298,13 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    // Compose-for-TV is only needed while compiling the opt-in TV source probe.
+    if (providers.gradleProperty("velabeat.universalTvSourceProbe")
+            .map(String::toBoolean).getOrElse(false)) {
+        implementation("androidx.tv:tv-material:1.0.0")
+        implementation("androidx.tv:tv-foundation:1.0.0-alpha12")
+    }
 
     // ---- Media playback: Media3 / ExoPlayer ----
     implementation("androidx.media3:media3-exoplayer:1.11.0")
@@ -518,5 +538,18 @@ if (providers.gradleProperty("bitchord.bundleWear").orNull != "false" && findPro
             apks.from(rootProject.layout.projectDirectory.dir("wearos/build/outputs/apk/$flavor/$type"))
         }
         variant.sources.assets?.addGeneratedSourceDirectory(bundle, BundleWearApk::outputDir)
+    }
+}
+
+// Exclude TV's intentionally inert Wear stand-ins from the experimental
+// combined Kotlin compile. Mobile Wear integrations remain authoritative.
+if (providers.gradleProperty("velabeat.universalTvSourceProbe")
+        .map(String::toBoolean).getOrElse(false)) {
+    val tvWearStubRoot = file("../tv/src/main/java/com/music/bitchord/wear")
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        exclude { element ->
+            element.file.parentFile == tvWearStubRoot &&
+                element.file.name in setOf("WatchInstaller.kt", "WearBridge.kt")
+        }
     }
 }
