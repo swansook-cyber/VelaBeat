@@ -82,6 +82,10 @@ jobs:
               echo "Expected VelaBeat package not found" >&2
               exit 1
             fi
+            if ! grep -q 'launchable-activity:' universal-apk-launchers.txt; then
+              echo "Missing mobile launcher entry" >&2
+              exit 1
+            fi
             if ! grep -q 'leanback-launchable-activity:' universal-apk-launchers.txt; then
               echo "Missing Leanback launcher entry" >&2
               exit 1
