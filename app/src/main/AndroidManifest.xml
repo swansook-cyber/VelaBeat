@@ -230,6 +230,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Experimental TV entry point: disabled unless the opt-in Gradle
+             manifest overlay explicitly enables it. No extra launcher icon in
+             the normal mobile APK. -->
+        <activity
+            android:name=".TvActivity"
+            android:enabled="false"
+            android:exported="false"
+            android:theme="@style/Theme.BitChord" />
+
         <!--
           The launcher entries live on aliases, not on MainActivity, so the user can
           swap the home-screen icon by enabling one alias and disabling the others
