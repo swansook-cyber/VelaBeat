@@ -41,3 +41,11 @@ One installable APK with one application ID for Android phone, tablet, Android T
 - Compose TV dependencies include `androidx.tv:tv-material:1.0.0` and `androidx.tv:tv-foundation:1.0.0-alpha12`. They must be added to the chosen universal module only when the TV UI source inclusion strategy is ready.
 - Next code gate: inventory every TV override and its references; decide between extracting a shared TV UI library module or selective inclusion into `app`. Prefer a shared library module to avoid duplicating classes.
 - The universal build remains unimplemented; no CI result or device test is implied by these changes.
+
+## TV source integration inventory (initial)
+- `tv/src/main/java/com/music/bitchord/TvActivity.kt` exists and delegates to `TvApp`; mobile `MainActivity.kt` is approximately 5,750 lines, making wholesale activity merging especially risky.
+- `tv/src/main/java/com/music/bitchord/ui/tv/TvApp.kt` is approximately 677 lines and imports TV-only components, dialogs, player, screens, theme, plus shared playback and view model APIs. Migrating `TvApp.kt` alone is insufficient.
+- `TvRefreshRateController.kt` is a TV-specific display controller with its own settings dependencies.
+- Existing TV Gradle build uses a per-relative-path override mechanism to exclude phone Kotlin classes replaced by TV implementations. A universal module must not indiscriminately include TV's entire Java tree.
+- Before introducing a unified launcher, determine the full transitive TV-only source set and resources, then identify duplicate classes. Preserve `TvActivity` lifecycle semantics and TV's intentional pause-on-exit behavior.
+- No single-APK implementation or CI verification has occurred in this inventory phase.
