@@ -46,15 +46,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          AAPT="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          AAPT="$(find "$SDK_ROOT/build-tools" -type f -name aapt | sort -V | tail -n 1)"
           test -x "$AAPT"
-          APK="$(find app/build/outputs/apk -type f -name '*armeabi-v7a*debug*.apk' | head -n 1)"
+          APK="$(find app/build/outputs/apk -type f -name '*debug*.apk' | sort | head -n 1)"
           test -n "$APK"
+          echo "Inspecting $APK with $AAPT"
           "$AAPT" dump badging "$APK" > velabeat-apk-branding.txt
-          grep -q "application-label:'VelaBeat'" velabeat-apk-branding.txt
-          grep -q "net.velalab.velabeat.dev" velabeat-apk-branding.txt
-          if grep -q "leanback-launchable-activity:" velabeat-apk-branding.txt; then
-            echo "Unexpected TV launcher" >&2
+          grep -E "^(package:|application-label:|application:|launchable-activity:|leanback-launchable-activity:)" velabeat-apk-branding.txt || true
+          grep -Fq "application-label:'VelaBeat'" velabeat-apk-branding.txt || { echo "::error::APK application label is not VelaBeat"; exit 1; }
+          grep -Fq "name='net.velalab.velabeat.dev'" velabeat-apk-branding.txt || { echo "::error::Unexpected application ID"; exit 1; }
+          if grep -q '^leanback-launchable-activity:' velabeat-apk-branding.txt; then
+            echo "::error::Unexpected TV launcher"
             exit 1
           fi
       - name: Upload APK branding inspection
