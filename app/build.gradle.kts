@@ -95,25 +95,6 @@ android {
         }
     }
 
-    // Experimental single-APK source compilation. Off by default; deliberately
-    // does not alter launchers, package IDs, or release builds.
-    // TV Wear stubs must never shadow the phone's real Wear integrations.
-    val universalTvSourceProbe = providers.gradleProperty("velabeat.universalTvSourceProbe")
-        .map(String::toBoolean).getOrElse(false)
-    defaultConfig {
-        manifestPlaceholders["velabeatTvLauncherEnabled"] = universalTvSourceProbe.toString()
-    }
-    if (universalTvSourceProbe) {
-        sourceSets {
-            getByName("main") {
-                java.srcDir("../tv/src/main/java")
-                // TvTheme uses fonts packaged only in the TV module.
-                res.srcDir("../tv/src/main/res")
-
-            }
-        }
-    }
-
     // The phone <-> watch protocol, one file shared with the watch app so the
     // two cannot drift. See wearos/protocol/.../WearProtocol.kt.
     sourceSets {
