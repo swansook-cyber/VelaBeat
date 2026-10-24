@@ -2,14 +2,13 @@ name: VelaBeat Baseline (Debug)
 
 on:
   push:
-    branches: [develop/velabeat-baseline, feature/velabeat-identity, feature/velabeat-universal-audit, feature/velabeat-car-display]
+    branches: [develop/velabeat-baseline, feature/velabeat-identity, feature/velabeat-universal-audit, feature/velabeat-car-display, feature/velabeat-mobile-car-only]
   workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
       - '.github/workflows/velabeat-baseline.yml'
       - 'app/**'
-      - 'tv/**'
       - 'shared/**'
       - 'sharedUi/**'
       - 'build.gradle.kts'
@@ -20,101 +19,6 @@ permissions:
   contents: read
 
 jobs:
-  universal-preflight:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Audit launcher entries and TV source overrides
-        run: python3 scripts/universal_preflight.py | tee universal-preflight.txt
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: velabeat-universal-preflight
-          path: |
-            universal-preflight.txt
-            universal-source-inventory.json
-          if-no-files-found: warn
-
-  universal-source-probe:
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    continue-on-error: true # exploratory: never block existing mobile/TV builds
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-          cache: gradle
-      - uses: android-actions/setup-android@v3
-        with:
-          packages: 'platform-tools'
-      - name: Compile mobile with TV sources (experimental)
-        id: compile
-        shell: bash
-        run: |
-          chmod +x ./gradlew
-          set -o pipefail
-          ./gradlew :app:assembleDevDebug -Pvelabeat.universalTvSourceProbe=true --stacktrace 2>&1 | tee universal-source-probe.log
-      - name: Verify combined APK launcher entries
-        if: success()
-        shell: bash
-        run: |
-          set -euo pipefail
-          : > universal-apk-launchers.txt
-          # Android build-tools binaries are not necessarily on PATH on runners.
-          AAPT="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -type f -name aapt | sort -V | tail -n 1)"
-          if [ -z "$AAPT" ] || [ ! -x "$AAPT" ]; then
-            echo "Android aapt not found in SDK build-tools" >&2
-            exit 1
-          fi
-          echo "Using $AAPT"
-          mapfile -t apks < <(find app/build/outputs/apk -type f -name '*debug*.apk' | sort)
-          if [ "${#apks[@]}" -eq 0 ]; then
-            echo "No debug APKs found" >&2
-            exit 1
-          fi
-          for apk in "${apks[@]}"; do
-            echo "=== $apk ===" | tee -a universal-apk-launchers.txt
-            "$AAPT" dump badging "$apk" | grep -E "^(package:|launchable-activity:|leanback-launchable-activity:)" | tee -a universal-apk-launchers.txt
-            "$AAPT" dump xmltree "$apk" AndroidManifest.xml > universal-manifest-tree.txt
-            if ! grep -q 'net.velalab.velabeat' universal-apk-launchers.txt; then
-              echo "Expected VelaBeat package not found" >&2
-              exit 1
-            fi
-            if ! grep -q 'launchable-activity:' universal-apk-launchers.txt; then
-              echo "Missing mobile launcher entry" >&2
-              exit 1
-            fi
-            if ! grep -q 'leanback-launchable-activity:' universal-apk-launchers.txt; then
-              echo "Missing Leanback launcher entry" >&2
-              exit 1
-            fi
-          done
-      - name: Upload launcher inspection
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: velabeat-universal-launcher-inspection
-          path: |
-            universal-apk-launchers.txt
-            universal-manifest-tree.txt
-          if-no-files-found: warn
-      - name: Upload experimental APKs (not universal UI yet)
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: velabeat-combined-source-debug
-          path: app/build/outputs/apk/**/*debug*.apk
-          if-no-files-found: error
-      - name: Upload experimental compiler log
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: velabeat-universal-source-probe
-          path: universal-source-probe.log
-          if-no-files-found: warn
-
   android-debug:
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -131,26 +35,19 @@ jobs:
       - name: Check Gradle tasks
         run: |
           chmod +x ./gradlew
-          ./gradlew :app:tasks :tv:tasks --all > gradle-tasks.txt
-      - name: Build Android and TV debug APKs
-        run: ./gradlew :app:assembleDevDebug :tv:assembleDevDebug --stacktrace
+          ./gradlew :app:tasks --all > gradle-tasks.txt
+      - name: Build VelaBeat mobile and car debug APKs
+        run: ./gradlew :app:assembleDevDebug --stacktrace
       - name: Report APK sizes
         if: success()
         run: |
-          find app/build/outputs/apk tv/build/outputs/apk -type f -name '*.apk' -printf '%p %s bytes\n' | sort
+          find app/build/outputs/apk -type f -name '*.apk' -printf '%p %s bytes\n' | sort
       - name: Upload mobile debug APKs
         uses: actions/upload-artifact@v4
         if: success()
         with:
           name: velabeat-mobile-debug
           path: app/build/outputs/apk/**/*debug*.apk
-          if-no-files-found: error
-      - name: Upload TV debug APKs
-        uses: actions/upload-artifact@v4
-        if: success()
-        with:
-          name: velabeat-tv-debug
-          path: tv/build/outputs/apk/**/*debug*.apk
           if-no-files-found: error
       - name: Upload Gradle task report
         uses: actions/upload-artifact@v4
