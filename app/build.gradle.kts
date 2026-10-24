@@ -135,7 +135,7 @@ android {
         create("dev") {
             dimension = "env"
             applicationId = "net.velalab.velabeat.dev"
-            resValue("string", "app_name", "VelaBeat Dev")
+            resValue("string", "app_name", "VelaBeat")
         }
         create("prod") {
             dimension = "env"
