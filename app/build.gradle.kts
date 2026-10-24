@@ -286,13 +286,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     debugImplementation("androidx.compose.ui:ui-tooling")
 
-    // Compose-for-TV is only needed while compiling the opt-in TV source probe.
-    if (providers.gradleProperty("velabeat.universalTvSourceProbe")
-            .map(String::toBoolean).getOrElse(false)) {
-        implementation("androidx.tv:tv-material:1.0.0")
-        implementation("androidx.tv:tv-foundation:1.0.0-alpha12")
-    }
-
     // ---- Media playback: Media3 / ExoPlayer ----
     implementation("androidx.media3:media3-exoplayer:1.11.0")
     implementation("androidx.media3:media3-session:1.11.0")
@@ -528,15 +521,3 @@ if (providers.gradleProperty("bitchord.bundleWear").orNull != "false" && findPro
     }
 }
 
-// Exclude TV's intentionally inert Wear stand-ins from the experimental
-// combined Kotlin compile. Mobile Wear integrations remain authoritative.
-if (providers.gradleProperty("velabeat.universalTvSourceProbe")
-        .map(String::toBoolean).getOrElse(false)) {
-    val tvWearStubRoot = file("../tv/src/main/java/com/music/bitchord/wear")
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        exclude { element ->
-            element.file.parentFile == tvWearStubRoot &&
-                element.file.name in setOf("WatchInstaller.kt", "WearBridge.kt")
-        }
-    }
-}
