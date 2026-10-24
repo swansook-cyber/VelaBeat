@@ -138,6 +138,34 @@ jobs:
         if: success()
         run: |
           find app/build/outputs/apk tv/build/outputs/apk -type f -name '*.apk' -printf '%p %s bytes\n' | sort
+      - name: Verify installed VelaBeat mobile branding
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          test -x "$AAPT"
+          mapfile -t apks < <(find app/build/outputs/apk/dev/debug -type f -name '*.apk' | sort)
+          test "${#apks[@]}" -gt 0
+          : > velabeat-mobile-branding.txt
+          for apk in "${apks[@]}"; do
+            echo "=== $apk ===" | tee -a velabeat-mobile-branding.txt
+            badging="$("$AAPT" dump badging "$apk")"
+            printf '%s\n' "$badging" | grep -E "^(package:|application-label:|application-label-|application:|launchable-activity:)" | tee -a velabeat-mobile-branding.txt
+            grep -Fq "package: name='net.velalab.velabeat.dev'" <<< "$badging"
+            grep -Fxq "application-label:'VelaBeat'" <<< "$badging"
+            if grep -Eq "application-label(:|-[^:]+:)'BitChord" <<< "$badging"; then
+              echo "Legacy BitChord launcher label found in $apk" >&2
+              exit 1
+            fi
+          done
+      - name: Upload mobile branding inspection
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: velabeat-mobile-branding-inspection
+          path: velabeat-mobile-branding.txt
+          if-no-files-found: warn
       - name: Upload mobile debug APKs
         uses: actions/upload-artifact@v4
         if: success()
