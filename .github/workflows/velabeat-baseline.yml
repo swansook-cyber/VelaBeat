@@ -42,6 +42,28 @@ jobs:
         if: success()
         run: |
           find app/build/outputs/apk -type f -name '*.apk' -printf '%p %s bytes\n' | sort
+      - name: Verify VelaBeat APK branding
+        shell: bash
+        run: |
+          set -euo pipefail
+          AAPT="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -type f -name aapt | sort -V | tail -n 1)"
+          test -x "$AAPT"
+          APK="$(find app/build/outputs/apk -type f -name '*armeabi-v7a*debug*.apk' | head -n 1)"
+          test -n "$APK"
+          "$AAPT" dump badging "$APK" > velabeat-apk-branding.txt
+          grep -q "application-label:'VelaBeat'" velabeat-apk-branding.txt
+          grep -q "net.velalab.velabeat.dev" velabeat-apk-branding.txt
+          if grep -q "leanback-launchable-activity:" velabeat-apk-branding.txt; then
+            echo "Unexpected TV launcher" >&2
+            exit 1
+          fi
+      - name: Upload APK branding inspection
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: velabeat-apk-branding
+          path: velabeat-apk-branding.txt
+          if-no-files-found: warn
       - name: Upload mobile debug APKs
         uses: actions/upload-artifact@v4
         if: success()
