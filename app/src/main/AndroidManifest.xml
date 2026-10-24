@@ -230,20 +230,7 @@
             </intent-filter>
         </activity>
 
-        <!-- Disabled in standard builds; opt-in combined-source builds expose
-             this TV home entry without replacing the phone manifest. -->
-        <activity
-            android:name=".TvActivity"
-            android:enabled="${velabeatTvLauncherEnabled}"
-            android:exported="${velabeatTvLauncherEnabled}"
-            android:label="@string/app_name"
-            android:banner="@drawable/velabeat_tv_banner"
-            android:theme="@style/Theme.BitChord">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
-            </intent-filter>
-        </activity>
+
 
         <!--
           The launcher entries live on aliases, not on MainActivity, so the user can
