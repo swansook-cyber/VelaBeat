@@ -154,8 +154,9 @@ jobs:
             printf '%s\n' "$badging" | grep -E "^(package:|application-label:|application-label-|application:|launchable-activity:)" | tee -a velabeat-mobile-branding.txt
             grep -Fq "package: name='net.velalab.velabeat.dev'" <<< "$badging"
             grep -Fxq "application-label:'VelaBeat'" <<< "$badging"
-            if grep -Eq "application-label(:|-[^:]+:)'BitChord" <<< "$badging"; then
-              echo "::warning::Legacy BitChord translated labels remain in $apk; default installed label is VelaBeat. Localized labels need separate migration."
+            if grep -Eq "application-label(:|-[^:]+:)'BitChord'" <<< "$badging"; then
+              echo "::error::Legacy BitChord launcher label remains in $apk"
+              exit 1
             fi
           done
       - name: Upload mobile branding inspection
