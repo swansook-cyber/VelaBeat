@@ -255,8 +255,8 @@
             android:name=".LauncherGlassLight"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_liquid_glass"
-            android:roundIcon="@mipmap/ic_liquid_glass"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -269,8 +269,8 @@
             android:name=".LauncherGlassDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_liquid_glass_dark"
-            android:roundIcon="@mipmap/ic_liquid_glass_dark"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -283,8 +283,8 @@
             android:name=".LauncherGlassClear"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_liquid_glass_clear"
-            android:roundIcon="@mipmap/ic_liquid_glass_clear"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -297,8 +297,8 @@
             android:name=".LauncherGlassClearDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_liquid_glass_clear_dark"
-            android:roundIcon="@mipmap/ic_liquid_glass_clear_dark"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -311,8 +311,8 @@
             android:name=".LauncherSamsungGlass"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_samsung_glass"
-            android:roundIcon="@mipmap/ic_samsung_glass"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -325,8 +325,8 @@
             android:name=".LauncherSamsungGlassDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_samsung_glass_dark"
-            android:roundIcon="@mipmap/ic_samsung_glass_dark"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -339,8 +339,8 @@
             android:name=".LauncherSamsungGlassClear"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_samsung_glass_clear"
-            android:roundIcon="@mipmap/ic_samsung_glass_clear"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -353,8 +353,8 @@
             android:name=".LauncherSamsungGlassClearDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_samsung_glass_clear_dark"
-            android:roundIcon="@mipmap/ic_samsung_glass_clear_dark"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -367,8 +367,8 @@
             android:name=".LauncherPixelGlass"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_pixel_glass"
-            android:roundIcon="@mipmap/ic_pixel_glass"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -381,8 +381,8 @@
             android:name=".LauncherPixelGlassDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_pixel_glass_dark"
-            android:roundIcon="@mipmap/ic_pixel_glass_dark"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -395,8 +395,8 @@
             android:name=".LauncherPixelGlassClear"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_pixel_glass_clear"
-            android:roundIcon="@mipmap/ic_pixel_glass_clear"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -409,8 +409,8 @@
             android:name=".LauncherPixelGlassClearDark"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_pixel_glass_clear_dark"
-            android:roundIcon="@mipmap/ic_pixel_glass_clear_dark"
+            android:icon="@mipmap/velabeat_launcher"
+            android:roundIcon="@mipmap/velabeat_launcher_round"
             android:label="@string/app_name"
             android:targetActivity=".MainActivity">
             <intent-filter>
