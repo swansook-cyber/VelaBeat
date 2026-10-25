@@ -102,6 +102,9 @@ android {
         .map(String::toBoolean).getOrElse(false)
     defaultConfig {
         manifestPlaceholders["velabeatTvLauncherEnabled"] = universalTvSourceProbe.toString()
+        manifestPlaceholders["velabeatDirectLauncherCategory"] =
+            if (universalTvSourceProbe) "android.intent.category.LAUNCHER"
+            else "android.intent.category.APP_MUSIC"
     }
     if (universalTvSourceProbe) {
         sourceSets {
