@@ -56,41 +56,24 @@ jobs:
           chmod +x ./gradlew
           set -o pipefail
           ./gradlew :app:assembleDevDebug -Pvelabeat.universalTvSourceProbe=true --stacktrace 2>&1 | tee universal-source-probe.log
-      - name: Verify combined APK launcher entries
+      - name: Verify single universal APK has mobile and TV launchers
         if: success()
         shell: bash
         run: |
           set -euo pipefail
           : > universal-apk-launchers.txt
-          # Android build-tools binaries are not necessarily on PATH on runners.
           AAPT="$(find "${ANDROID_HOME:-$ANDROID_SDK_ROOT}/build-tools" -type f -name aapt | sort -V | tail -n 1)"
-          if [ -z "$AAPT" ] || [ ! -x "$AAPT" ]; then
-            echo "Android aapt not found in SDK build-tools" >&2
-            exit 1
-          fi
-          echo "Using $AAPT"
-          mapfile -t apks < <(find app/build/outputs/apk -type f -name '*debug*.apk' | sort)
-          if [ "${#apks[@]}" -eq 0 ]; then
-            echo "No debug APKs found" >&2
-            exit 1
-          fi
-          for apk in "${apks[@]}"; do
-            echo "=== $apk ===" | tee -a universal-apk-launchers.txt
-            "$AAPT" dump badging "$apk" | grep -E "^(package:|launchable-activity:|leanback-launchable-activity:)" | tee -a universal-apk-launchers.txt
-            "$AAPT" dump xmltree "$apk" AndroidManifest.xml > universal-manifest-tree.txt
-            if ! grep -q 'net.velalab.velabeat' universal-apk-launchers.txt; then
-              echo "Expected VelaBeat package not found" >&2
-              exit 1
-            fi
-            if ! grep -q 'launchable-activity:' universal-apk-launchers.txt; then
-              echo "Missing mobile launcher entry" >&2
-              exit 1
-            fi
-            if ! grep -q 'leanback-launchable-activity:' universal-apk-launchers.txt; then
-              echo "Missing Leanback launcher entry" >&2
-              exit 1
-            fi
-          done
+          test -x "$AAPT"
+          apk="app/build/outputs/apk/dev/debug/app-dev-universal-debug.apk"
+          test -s "$apk"
+          badging="$("$AAPT" dump badging "$apk")"
+          printf '%s\\n' "$badging" | grep -E "^(package:|application-label:|launchable-activity:|leanback-launchable-activity:)" | tee universal-apk-launchers.txt
+          "$AAPT" dump xmltree "$apk" AndroidManifest.xml > universal-manifest-tree.txt
+          grep -Fq "package: name='net.velalab.velabeat.dev'" <<< "$badging"
+          grep -Fxq "application-label:'VelaBeat'" <<< "$badging"
+          grep -q '^launchable-activity:' <<< "$badging"
+          grep -q '^leanback-launchable-activity:' <<< "$badging"
+          echo "Single universal APK has both launchers; device installation and remote testing still required"
       - name: Upload launcher inspection
         uses: actions/upload-artifact@v4
         if: always()
