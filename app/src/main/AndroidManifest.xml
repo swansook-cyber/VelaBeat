@@ -110,6 +110,13 @@
             android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:theme="@style/Theme.BitChord">
+            <!-- Combined-source builds need a direct phone launcher entry:
+                 aapt may report only Leanback when the phone entry is an alias.
+                 Standard builds retain the APP_MUSIC category here. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="${velabeatDirectLauncherCategory}" />
+            </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <!--
