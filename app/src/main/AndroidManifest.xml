@@ -110,26 +110,12 @@
             android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden"
             android:theme="@style/Theme.BitChord">
-            <!-- Combined-source builds need a direct phone launcher entry:
-                 aapt may report only Leanback when the phone entry is an alias.
-                 Standard builds retain the APP_MUSIC category here. -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="${velabeatDirectLauncherCategory}" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <!--
-                  What makes the system call this a music app. "Play music" from
-                  the assistant, Android Auto's media list and the OEM pickers
-                  that put up "Complete action using" all ask for
-                  MAIN/APP_MUSIC by name and list whoever answers — a launcher
-                  entry alone is not enough, which is why BitChord was missing
-                  from that dialog while every other player on the device was in
-                  it.
-                -->
-                <category android:name="android.intent.category.APP_MUSIC" />
-            </intent-filter>
+            <!--
+              Only the enabled LauncherDefault alias owns MAIN/LAUNCHER.
+              Do not add MAIN on MainActivity: automotive launchers may show
+              a second VelaBeat icon even when the category is APP_MUSIC.
+              The media service and car metadata handle Android Auto.
+            -->
 
             <!--
               The pre-Lollipop spelling of the same request. Deprecated, and
