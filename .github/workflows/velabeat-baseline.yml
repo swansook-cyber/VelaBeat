@@ -48,6 +48,15 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools'
+      - name: Install required Android SDK native build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="${ANDROID_HOME:-${ANDROID_SDK_ROOT}}/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" --install "cmake;3.22.1" "ndk;27.0.12077973"
+          "$SDKMANAGER" --list_installed | grep -E 'cmake;3.22.1|ndk;27.0.12077973'
       - name: Build single mobile car TV universal debug APK
         id: compile
         shell: bash
