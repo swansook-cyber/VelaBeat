@@ -49,7 +49,8 @@ jobs:
           SDK_ROOT="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
           AAPT="$(find "$SDK_ROOT/build-tools" -type f -name aapt | sort -V | tail -n 1)"
           test -x "$AAPT"
-          APK="$(find app/build/outputs/apk -type f -name '*debug*.apk' | sort | head -n 1)"
+          APK="$(find app/build/outputs/apk -type f -name '*universal*debug*.apk' | sort | head -n 1)"
+          test -n "$APK" || { echo '::error::Universal APK not found'; exit 1; }
           test -n "$APK"
           echo "Inspecting $APK with $AAPT"
           "$AAPT" dump badging "$APK" > velabeat-apk-branding.txt
@@ -72,7 +73,7 @@ jobs:
         if: success()
         with:
           name: velabeat-mobile-debug
-          path: app/build/outputs/apk/**/*debug*.apk
+          path: app/build/outputs/apk/**/*universal*debug*.apk
           if-no-files-found: error
       - name: Upload Gradle task report
         uses: actions/upload-artifact@v4
